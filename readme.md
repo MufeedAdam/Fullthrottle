@@ -41,7 +41,7 @@ You don’t have to ever use `eject`. The curated feature set is suitable for sm
 
 If you want to build the docs file then this command can be used.
 
-See the section about [depdocumentation](https://github.com/shri/JSDoc-Style-Guide) for more information.
+See the section about [documentation](https://github.com/shri/JSDoc-Style-Guide) for more information.
 
 ## Learn More
 
@@ -72,3 +72,8 @@ This section has moved here: https://facebook.github.io/create-react-app/docs/de
 ### `npm run build` fails to minify
 
 This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+
+
+### Documentation of the project
+
+See the section about [documentation of project](https://mufeedadam.github.io/Fullthrottle/index.html)
