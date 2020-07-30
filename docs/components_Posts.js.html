@@ -1,0 +1,282 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title> components/Posts.js</title>
+
+  <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="./build/entry.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:100,400,700|Inconsolata,700" rel="stylesheet">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+  <link type="text/css" rel="stylesheet" href="https://jmblog.github.io/color-themes-for-google-code-prettify/themes/tomorrow-night.min.css">
+  <link type="text/css" rel="stylesheet" href="styles/app.min.css">
+  <link type="text/css" rel="stylesheet" href="styles/iframe.css">
+  <link type="text/css" rel="stylesheet" href="">
+  <script async defer src="https://buttons.github.io/buttons.js"></script>
+
+  
+</head>
+
+
+
+<body class="layout small-header">
+    <div id="stickyNavbarOverlay"></div>
+    
+
+<div class="top-nav">
+    <div class="inner">
+        <a id="hamburger" role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+        </a>
+        <div class="logo">
+            
+            
+        </div>
+        <div class="menu">
+            
+            <div class="navigation">
+                <a
+                    href="index.html"
+                    class="link"
+                >
+                    API Documentation
+                </a>
+                
+                
+                
+            </div>
+        </div>
+    </div>
+</div>
+    <div id="main">
+        <div
+            class="sidebar "
+            id="sidebarNav"
+        >
+            
+            <nav>
+                
+                    <h2><a href="index.html">Documentation</a></h2><div class="category"><h3>Modules</h3><ul><li><a href="module-Posts.html">Posts</a></li></ul></div>
+                
+            </nav>
+        </div>
+        <div class="core" id="main-content-wrapper">
+            <div class="content">
+                <header class="page-title">
+                    <p>Source</p>
+                    <h1>components/Posts.js</h1>
+                </header>
+                
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/** 
+ *  @fileOverview This file will have the list of users displayed and also the modal for selected user.
+ *
+ *  @author       G M Mufeed
+ *
+ *  @requires     NPM:react
+ *  @requires     NPM:react-bootstrap
+ *  @requires     NPM:moment
+ *  @requires     NPM:react-loader-spinner
+ *  @requires     NPM:react-datepicker
+ *  @requires     react-datepicker/dist/react-datepicker.css:react-datepicker
+ */
+import React, { useState, useEffect } from "react";
+import { Button, Modal } from "react-bootstrap";
+import moment from "moment";
+import Loader from "react-loader-spinner";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+
+/**
+ * Component for showing details of the user and the Modal.
+ * 
+ * @module Posts
+ * @component
+ * @param  {Object} posts - Array of Users List
+ * @param  {boolean} loading - To check if the data is recieved from the API
+ */
+const Posts = ({ posts, loading }) => {
+  const [show, setShow] = useState(false); //For Modal
+  const [timer, setTimer] = useState([]);
+  const [name, setName] = useState(""); //To get user name in Modal
+  const [date, setDate] = useState(""); //To set the date selected
+  const [total, setTotal] = useState(""); //Total hours active on particular day
+  const [id, setId] = useState(""); //id of the userselected
+  const [startDate, setStartDate] = useState(new Date()); //Current Date
+
+  useEffect(() => {
+    setDate(moment().format("MMM DD YYYY"));
+  }, []);
+
+
+  /**
+   * Function to  close the modal on click
+   * @method handleClose
+   */
+  const handleClose = () => setShow(false);
+
+
+  /**
+   * Function to  Generate list/filter the activity on particular day for an use
+   * @method list
+   * @param  {string} ida - The id of the selected user
+   * @param  {string} d - Date for which the user activity must be displayed
+   */
+  const list = (ida, d) => {
+    const founds = posts.find(post => post.id === ida);
+    var arr = founds.activity_periods;
+    var time = arr.find(post =>
+      moment(
+        moment(post.start_time, "MMM D YYYY h:mmA").format("MMM D YYYY")
+      ).isSame(d)
+    );
+    if (time) {
+      setTimer(time);
+    } else {
+      setTimer();
+    }
+
+    if (time)
+      var set = moment
+        .utc(
+          moment(time.end_time, "MMM D YYYY h:mmA").diff(
+            moment(time.start_time, "MMM D YYYY h:mmA")
+          )
+        )
+        .format("HH:mm:ss");
+
+    setName(founds.real_name);
+    setTotal(set);
+  };
+  /**
+  * Function to handle modal and show it, when clicked on an user
+  * @method handleShow
+  * @param   {string} ida  The id of the selected user
+  * @param   {string} d   Date for which the user activity must be displayed
+  */
+  const handleShow = (ida, e) => {
+    e.preventDefault();
+    setId(ida);
+    setStartDate(new Date());
+    setDate(moment().format("MMM DD YYYY"));
+    list(ida);
+    setShow(true);
+  };
+
+  /**
+   * Function to handle after the date is selceted
+   * @method handleSelect
+   * @param   {string} date  Date for which the user activity must be displayed
+   */
+  const handleSelect = date => {
+    setDate(moment(date).format("MMM D YYYY"));
+    setStartDate(date);
+    list(id, moment(date).format("MMM D YYYY"));
+  };
+  /**
+   * returns Loader until the values are fetched from mockAPI
+   * @param  {boolean} loading
+   */
+  if (loading) {
+    return &lt;Loader type="Audio" color="#00BFFF" height={80} width={80} />;
+  }
+
+  return (
+    &lt;React.Fragment>
+      &lt;ul className="list-group mb-4">
+        {posts.map(post => (
+          &lt;li
+            key={post.id}
+            className="list-group-item"
+            onClick={e => handleShow(post.id, e)}
+          >
+            &lt;b>Name : &lt;/b>
+            {post.real_name}
+            &lt;br />
+            &lt;b>Time Zone : &lt;/b>
+            {post.tz}
+          &lt;/li>
+        ))}
+      &lt;/ul>
+
+      &lt;Modal show={show} onHide={handleClose}>
+        &lt;Modal.Header closeButton>
+          &lt;Modal.Title>{name}&lt;/Modal.Title>
+        &lt;/Modal.Header>
+        &lt;Modal.Body>
+          &lt;DatePicker
+            selected={startDate}
+            onSelect={handleSelect} //when day is clicked
+          />
+          &lt;br />
+          &lt;b>Date : &lt;/b> {date}
+          {timer ? (
+            &lt;li className="list-group-item list-group-item-success">
+              {timer.start_time} to {timer.end_time}{" "}
+              &lt;span className="badge badge-primary badge-pill">
+                {total} Hours
+              &lt;/span>
+            &lt;/li>
+          ) : (
+              &lt;li className="list-group-item list-group-item-danger">
+                No Activity
+              &lt;/li>
+            )}
+        &lt;/Modal.Body>
+        &lt;Modal.Footer>
+          &lt;Button variant="secondary" onClick={handleClose}>
+            Close
+          &lt;/Button>
+        &lt;/Modal.Footer>
+      &lt;/Modal>
+    &lt;/React.Fragment>
+  );
+};
+
+export default Posts;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+            </div>
+            
+            <footer class="footer">
+                <div class="content has-text-centered">
+                    <p>Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.5</a></p>
+                    <p class="sidebar-created-by">
+                        <a href="https://github.com/SoftwareBrothers/better-docs" target="_blank">BetterDocs theme</a> provided with <i class="fas fa-heart"></i> by 
+                        <a href="http://softwarebrothers.co" target="_blank">SoftwareBrothers - JavaScript Development Agency</a>
+                    </p>
+                </div>
+            </footer>
+            
+        </div>
+        <div id="side-nav" class="side-nav">
+        </div>
+    </div>
+<script src="scripts/app.min.js"></script>
+<script>PR.prettyPrint();</script>
+<script src="scripts/linenumber.js"> </script>
+
+</body>
+</html>
